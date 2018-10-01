@@ -1,0 +1,42 @@
+version: "3.2"
+
+services:
+  kafka:
+    image: spotify/kafka
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+  
+  order-service-node:
+    build: ./order-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - kafka
+      - order-service-mongo
+    volumes:
+      - ./order-service:/usr/src/app
+  
+  order-service-mongo:
+    image: mongo
+    volumes:
+      - order-service-data:/data/db
+  
+  user-service-node:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - kafka
+      - user-service-mongo
+    volumes:
+      - ./user-service:/usr/src/app
+  
+  user-service-mongo:
+    image: mongo
+    volumes:
+      - user-service-data:/data/db
+
+volumes:
+  order-service-data:
+  user-service-data:
